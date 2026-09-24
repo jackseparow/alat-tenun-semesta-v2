@@ -50,12 +50,453 @@
     </div>
   </main>
 
-  <!-- Modul Bundle Utuh -->
-  <script src="block_nature.js"></script>
-
   <script>
+    // =========================================================================
+    // DEFINISI KUSTOM BLOK BLOCKLY & GENERATOR JAVASCRIPT
+    // =========================================================================
     const jsGen = (typeof javascript !== 'undefined' && javascript.javascriptGenerator) ? javascript.javascriptGenerator : javascriptGenerator;
 
+    // -------------------------------------------------------------------------
+    // 1. ELEMEN ALAM (Petal, Seed, Stem, Origami, Shell Segment, Pivot)
+    // -------------------------------------------------------------------------
+    Blockly.Blocks['nature_petal'] = {
+      init: function() {
+        this.appendDummyInput().appendField("Mahkota Bunga (Petal)");
+        this.appendValueInput("LENGTH").setCheck("Number").appendField("Panjang");
+        this.appendValueInput("WIDTH").setCheck("Number").appendField("Lebar");
+        this.appendValueInput("CURVE").setCheck("Number").appendField("Kelengkungan");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#E91E63");
+      }
+    };
+    jsGen.forBlock['nature_petal'] = function(block, generator) {
+      var len = generator.valueToCode(block, 'LENGTH', javascript.Order.ATOMIC) || '15';
+      var w = generator.valueToCode(block, 'WIDTH', javascript.Order.ATOMIC) || '6';
+      var c = generator.valueToCode(block, 'CURVE', javascript.Order.ATOMIC) || '4';
+      return `
+(function() {
+  var geom = new THREE.ConeGeometry(${w}, ${len}, 16);
+  var mat = new THREE.MeshPhongMaterial({ color: 0xe91e63, side: THREE.DoubleSide });
+  var mesh = new THREE.Mesh(geom, mat);
+  mesh.rotation.x = Math.PI / 2;
+  mesh.position.z = ${len}/2;
+  sceneGroup.add(mesh);
+})();\n`;
+    };
+
+    Blockly.Blocks['nature_seed'] = {
+      init: function() {
+        this.appendDummyInput().appendField("Biji (Seed)");
+        this.appendValueInput("RADIUS").setCheck("Number").appendField("Jari-jari");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#E91E63");
+      }
+    };
+    jsGen.forBlock['nature_seed'] = function(block, generator) {
+      var r = generator.valueToCode(block, 'RADIUS', javascript.Order.ATOMIC) || '1.5';
+      return `
+(function() {
+  var geom = new THREE.SphereGeometry(${r}, 16, 16);
+  var mat = new THREE.MeshPhongMaterial({ color: 0xffb74d });
+  var mesh = new THREE.Mesh(geom, mat);
+  sceneGroup.add(mesh);
+})();\n`;
+    };
+
+    Blockly.Blocks['nature_stem'] = {
+      init: function() {
+        this.appendDummyInput().appendField("Batang (Stem)");
+        this.appendValueInput("RADIUS_BOTTOM").setCheck("Number").appendField("Jari-jari Bawah");
+        this.appendValueInput("RADIUS_TOP").setCheck("Number").appendField("Jari-jari Atas");
+        this.appendValueInput("HEIGHT").setCheck("Number").appendField("Tinggi");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#E91E63");
+      }
+    };
+    jsGen.forBlock['nature_stem'] = function(block, generator) {
+      var rb = generator.valueToCode(block, 'RADIUS_BOTTOM', javascript.Order.ATOMIC) || '2';
+      var rt = generator.valueToCode(block, 'RADIUS_TOP', javascript.Order.ATOMIC) || '1.5';
+      var h = generator.valueToCode(block, 'HEIGHT', javascript.Order.ATOMIC) || '10';
+      return `
+(function() {
+  var geom = new THREE.CylinderGeometry(${rt}, ${rb}, ${h}, 16);
+  var mat = new THREE.MeshPhongMaterial({ color: 0x4caf50 });
+  var mesh = new THREE.Mesh(geom, mat);
+  mesh.position.z = ${h}/2;
+  mesh.rotation.x = Math.PI / 2;
+  sceneGroup.add(mesh);
+})();\n`;
+    };
+
+    Blockly.Blocks['nature_origami_face'] = {
+      init: function() {
+        this.appendDummyInput().appendField("Muka Origami");
+        this.appendValueInput("SIZE").setCheck("Number").appendField("Ukuran");
+        this.appendValueInput("ANGLE").setCheck("Number").appendField("Sudut");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#E91E63");
+      }
+    };
+    jsGen.forBlock['nature_origami_face'] = function(block, generator) {
+      var s = generator.valueToCode(block, 'SIZE', javascript.Order.ATOMIC) || '10';
+      return `
+(function() {
+  var geom = new THREE.PlaneGeometry(${s}, ${s});
+  var mat = new THREE.MeshPhongMaterial({ color: 0x00bcd4, side: THREE.DoubleSide });
+  var mesh = new THREE.Mesh(geom, mat);
+  sceneGroup.add(mesh);
+})();\n`;
+    };
+
+    Blockly.Blocks['nature_shell_segment'] = {
+      init: function() {
+        this.appendDummyInput().appendField("Segmen Kerang");
+        this.appendValueInput("RADIUS").setCheck("Number").appendField("Jari-jari Utama");
+        this.appendValueInput("TUBE").setCheck("Number").appendField("Tebal Tabung");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#E91E63");
+      }
+    };
+    jsGen.forBlock['nature_shell_segment'] = function(block, generator) {
+      var r = generator.valueToCode(block, 'RADIUS', javascript.Order.ATOMIC) || '8';
+      var t = generator.valueToCode(block, 'TUBE', javascript.Order.ATOMIC) || '2';
+      return `
+(function() {
+  var geom = new THREE.TorusGeometry(${r}, ${t}, 12, 24);
+  var mat = new THREE.MeshPhongMaterial({ color: 0xba68c8 });
+  var mesh = new THREE.Mesh(geom, mat);
+  sceneGroup.add(mesh);
+})();\n`;
+    };
+
+    Blockly.Blocks['nature_pivot'] = {
+      init: function() {
+        this.appendDummyInput().appendField("Titik Pivot");
+        this.appendValueInput("SIZE").setCheck("Number").appendField("Ukuran");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#E91E63");
+      }
+    };
+    jsGen.forBlock['nature_pivot'] = function(block, generator) {
+      return `// Pivot Point Marker\n`;
+    };
+
+
+    // -------------------------------------------------------------------------
+    // 2. TRANSFORMASI (Translasi, Dilatasi, Rotasi Bidang, Rotasi Garis 3D, Warna)
+    // -------------------------------------------------------------------------
+    Blockly.Blocks['transform_translate'] = {
+      init: function() {
+        this.appendDummyInput().appendField("Translasi (Geser)");
+        this.appendValueInput("X").setCheck("Number").appendField("X");
+        this.appendValueInput("Y").setCheck("Number").appendField("Y");
+        this.appendValueInput("Z").setCheck("Number").appendField("Z");
+        this.appendStatementInput("DO").appendField("terhadap objek");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#FF9800");
+      }
+    };
+    jsGen.forBlock['transform_translate'] = function(block, generator) {
+      var x = generator.valueToCode(block, 'X', javascript.Order.ATOMIC) || '0';
+      var y = generator.valueToCode(block, 'Y', javascript.Order.ATOMIC) || '0';
+      var z = generator.valueToCode(block, 'Z', javascript.Order.ATOMIC) || '0';
+      var body = generator.statementToCode(block, 'DO');
+      return `
+(function() {
+  var grp = new THREE.Group();
+  sceneGroup.add(grp);
+  (function(sceneGroup) {
+    ${body}
+  })(grp);
+  grp.position.x += ${x};
+  grp.position.y += ${y};
+  grp.position.z += ${z};
+})();\n`;
+    };
+
+    Blockly.Blocks['transform_dilatation'] = {
+      init: function() {
+        this.appendDummyInput().appendField("Dilatasi (Skala)");
+        this.appendValueInput("FACTOR").setCheck("Number").appendField("Faktor");
+        this.appendValueInput("PX").setCheck("Number").appendField("Pusat X");
+        this.appendValueInput("PY").setCheck("Number").appendField("Y");
+        this.appendValueInput("PZ").setCheck("Number").appendField("Z");
+        this.appendStatementInput("DO").appendField("terhadap objek");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#FF9800");
+      }
+    };
+    jsGen.forBlock['transform_dilatation'] = function(block, generator) {
+      var f = generator.valueToCode(block, 'FACTOR', javascript.Order.ATOMIC) || '1';
+      var body = generator.statementToCode(block, 'DO');
+      return `
+(function() {
+  var grp = new THREE.Group();
+  sceneGroup.add(grp);
+  (function(sceneGroup) {
+    ${body}
+  })(grp);
+  grp.scale.multiplyScalar(${f});
+})();\n`;
+    };
+
+    // 2A. ROTASI BIDANG (XY, XZ, YZ)
+    Blockly.Blocks['transform_rotate'] = {
+      init: function() {
+        this.appendDummyInput()
+            .appendField("Rotasikan di bidang")
+            .appendField(new Blockly.FieldDropdown([
+              ["XY (Sumbu Z)", "XY"],
+              ["XZ (Sumbu Y)", "XZ"],
+              ["YZ (Sumbu X)", "YZ"]
+            ]), "PLANE");
+        this.appendValueInput("ANGLE").setCheck("Number").appendField("sebesar sudut");
+        this.appendValueInput("PX").setCheck("Number").appendField("pusat X");
+        this.appendValueInput("PY").setCheck("Number").appendField("Y");
+        this.appendValueInput("PZ").setCheck("Number").appendField("Z");
+        this.appendStatementInput("DO").appendField("terhadap objek");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#FF9800");
+      }
+    };
+    jsGen.forBlock['transform_rotate'] = function(block, generator) {
+      var plane = block.getFieldValue('PLANE');
+      var angle = generator.valueToCode(block, 'ANGLE', javascript.Order.ATOMIC) || '0';
+      var px = generator.valueToCode(block, 'PX', javascript.Order.ATOMIC) || '0';
+      var py = generator.valueToCode(block, 'PY', javascript.Order.ATOMIC) || '0';
+      var pz = generator.valueToCode(block, 'PZ', javascript.Order.ATOMIC) || '0';
+      var body = generator.statementToCode(block, 'DO');
+
+      return `
+(function() {
+  var rad = (${angle}) * Math.PI / 180;
+  var px = ${px}, py = ${py}, pz = ${pz};
+  var plane = "${plane}";
+
+  var tempGroup = new THREE.Group();
+  sceneGroup.add(tempGroup);
+
+  (function(sceneGroup) {
+    ${body}
+  })(tempGroup);
+
+  tempGroup.children.forEach(function(child) {
+    child.position.x -= px;
+    child.position.y -= py;
+    child.position.z -= pz;
+
+    if (plane === 'XY') child.rotation.z += rad;
+    else if (plane === 'XZ') child.rotation.y += rad;
+    else if (plane === 'YZ') child.rotation.x += rad;
+
+    var cosA = Math.cos(rad), sinA = Math.sin(rad);
+    var rx = child.position.x, ry = child.position.y, rz = child.position.z;
+
+    if (plane === 'XY') {
+      child.position.x = rx * cosA - ry * sinA;
+      child.position.y = rx * sinA + ry * cosA;
+    } else if (plane === 'XZ') {
+      child.position.x = rx * cosA + rz * sinA;
+      child.position.z = -rx * sinA + rz * cosA;
+    } else if (plane === 'YZ') {
+      child.position.y = ry * cosA - rz * sinA;
+      child.position.z = ry * sinA + rz * cosA;
+    }
+
+    child.position.x += px;
+    child.position.y += py;
+    child.position.z += pz;
+  });
+
+  while(tempGroup.children.length > 0) {
+    sceneGroup.add(tempGroup.children[0]);
+  }
+  sceneGroup.remove(tempGroup);
+})();\n`;
+    };
+
+    // 2B. ROTASI SUMBU GARIS 3D
+    Blockly.Blocks['transform_rotate_axis'] = {
+      init: function() {
+        this.appendDummyInput().appendField("Rotasikan terhadap garis 3D");
+        this.appendValueInput("ANGLE").setCheck("Number").appendField("sudut (derajat)");
+        this.appendDummyInput().appendField("Garis Titik 1 (X1, Y1, Z1):");
+        this.appendValueInput("X1").setCheck("Number").appendField("X1");
+        this.appendValueInput("Y1").setCheck("Number").appendField("Y1");
+        this.appendValueInput("Z1").setCheck("Number").appendField("Z1");
+        this.appendDummyInput().appendField("Garis Titik 2 (X2, Y2, Z2):");
+        this.appendValueInput("X2").setCheck("Number").appendField("X2");
+        this.appendValueInput("Y2").setCheck("Number").appendField("Y2");
+        this.appendValueInput("Z2").setCheck("Number").appendField("Z2");
+        this.appendStatementInput("DO").appendField("terhadap objek");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#FF9800");
+      }
+    };
+    jsGen.forBlock['transform_rotate_axis'] = function(block, generator) {
+      var angle = generator.valueToCode(block, 'ANGLE', javascript.Order.ATOMIC) || '0';
+      var x1 = generator.valueToCode(block, 'X1', javascript.Order.ATOMIC) || '0';
+      var y1 = generator.valueToCode(block, 'Y1', javascript.Order.ATOMIC) || '0';
+      var z1 = generator.valueToCode(block, 'Z1', javascript.Order.ATOMIC) || '0';
+      var x2 = generator.valueToCode(block, 'X2', javascript.Order.ATOMIC) || '0';
+      var y2 = generator.valueToCode(block, 'Y2', javascript.Order.ATOMIC) || '0';
+      var z2 = generator.valueToCode(block, 'Z2', javascript.Order.ATOMIC) || '10';
+      var body = generator.statementToCode(block, 'DO');
+
+      return `
+(function() {
+  var rad = (${angle}) * Math.PI / 180;
+  var p1 = new THREE.Vector3(${x1}, ${y1}, ${z1});
+  var p2 = new THREE.Vector3(${x2}, ${y2}, ${z2});
+  var axis = new THREE.Vector3().subVectors(p2, p1).normalize();
+  if (axis.length() === 0) axis.set(0, 0, 1);
+
+  var tempGroup = new THREE.Group();
+  sceneGroup.add(tempGroup);
+
+  (function(sceneGroup) {
+    ${body}
+  })(tempGroup);
+
+  tempGroup.children.forEach(function(child) {
+    child.position.sub(p1);
+    child.position.applyAxisAngle(axis, rad);
+    child.position.add(p1);
+    child.rotateOnWorldAxis(axis, rad);
+  });
+
+  while(tempGroup.children.length > 0) {
+    sceneGroup.add(tempGroup.children[0]);
+  }
+  sceneGroup.remove(tempGroup);
+})();\n`;
+    };
+
+    Blockly.Blocks['transform_color'] = {
+      init: function() {
+        this.appendDummyInput()
+            .appendField("Ubah Warna")
+            .appendField(new Blockly.FieldColour("#ff0000"), "COLOR");
+        this.appendStatementInput("DO").appendField("terhadap objek");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour("#FF9800");
+      }
+    };
+    jsGen.forBlock['transform_color'] = function(block, generator) {
+      var col = block.getFieldValue('COLOR');
+      var body = generator.statementToCode(block, 'DO');
+      return `
+(function() {
+  var grp = new THREE.Group();
+  sceneGroup.add(grp);
+  (function(sceneGroup) {
+    ${body}
+  })(grp);
+  grp.traverse(function(child) {
+    if (child.isMesh && child.material) {
+      child.material.color.set("${col}");
+    }
+  });
+})();\n`;
+    };
+
+
+    // -------------------------------------------------------------------------
+    // 3. MATEMATIKA SEMESTA (Sudut, Golden Angle, Phi Ratio, Fibonacci, Radian, Modulo)
+    // -------------------------------------------------------------------------
+    Blockly.Blocks['nature_angle'] = {
+      init: function() {
+        this.appendDummyInput().appendField(new Blockly.FieldNumber(137.5), "ANGLE").appendField("° (derajat)");
+        this.setOutput(true, "Number");
+        this.setColour("#5B80A5");
+      }
+    };
+    jsGen.forBlock['nature_angle'] = function(block) {
+      return [block.getFieldValue('ANGLE'), javascript.Order.ATOMIC];
+    };
+
+    Blockly.Blocks['nature_golden_angle'] = {
+      init: function() {
+        this.appendDummyInput().appendField("Sudut Emas (137.5°)");
+        this.setOutput(true, "Number");
+        this.setColour("#5B80A5");
+      }
+    };
+    jsGen.forBlock['nature_golden_angle'] = function() {
+      return ['137.5', javascript.Order.ATOMIC];
+    };
+
+    Blockly.Blocks['nature_phi_ratio'] = {
+      init: function() {
+        this.appendDummyInput().appendField("Rasio Emas Phi (Φ / 1.618)");
+        this.setOutput(true, "Number");
+        this.setColour("#5B80A5");
+      }
+    };
+    jsGen.forBlock['nature_phi_ratio'] = function() {
+      return ['1.61803398875', javascript.Order.ATOMIC];
+    };
+
+    Blockly.Blocks['nature_fibonacci'] = {
+      init: function() {
+        this.appendDummyInput().appendField("Deret Fibonacci Suku ke-");
+        this.appendValueInput("N").setCheck("Number");
+        this.setOutput(true, "Number");
+        this.setColour("#5B80A5");
+      }
+    };
+    jsGen.forBlock['nature_fibonacci'] = function(block, generator) {
+      var n = generator.valueToCode(block, 'N', javascript.Order.ATOMIC) || '1';
+      var code = `(function(n) {
+        var a = 0, b = 1;
+        for (var i = 0; i < n; i++) { var temp = a; a = b; b = temp + b; }
+        return a;
+      })(${n})`;
+      return [code, javascript.Order.FUNCTION_CALL];
+    };
+
+    Blockly.Blocks['nature_deg_to_rad'] = {
+      init: function() {
+        this.appendValueInput("DEG").setCheck("Number").appendField("Konversi Derajat ke Radian");
+        this.setOutput(true, "Number");
+        this.setColour("#5B80A5");
+      }
+    };
+    jsGen.forBlock['nature_deg_to_rad'] = function(block, generator) {
+      var deg = generator.valueToCode(block, 'DEG', javascript.Order.ATOMIC) || '0';
+      return [`(${deg} * Math.PI / 180)`, javascript.Order.MULTIPLICATION];
+    };
+
+    Blockly.Blocks['nature_modulo'] = {
+      init: function() {
+        this.appendValueInput("DIVIDEND").setCheck("Number");
+        this.appendValueInput("DIVISOR").setCheck("Number").appendField("mod");
+        this.setOutput(true, "Number");
+        this.setColour("#5B80A5");
+      }
+    };
+    jsGen.forBlock['nature_modulo'] = function(block, generator) {
+      var a = generator.valueToCode(block, 'DIVIDEND', javascript.Order.ATOMIC) || '0';
+      var b = generator.valueToCode(block, 'DIVISOR', javascript.Order.ATOMIC) || '1';
+      return [`(${a} % ${b})`, javascript.Order.MODULUS];
+    };
+  </script>
+
+  <script>
+    // =========================================================================
+    // INISIALISASI BLOCKLY WORKSPACE & THREE.JS
+    // =========================================================================
     const toolboxXml = `
       <xml id="toolbox" style="display: none">
         <!-- 1. KATEGORI ELEMEN ALAM -->
@@ -126,7 +567,6 @@
             <value name="Z2"><shadow type="math_number"><field name="NUM">10</field></shadow></value>
           </block>
 
-          <!-- Transformasi Ubah Warna Palet Native GeoBlock -->
           <block type="transform_color"></block>
         </category>
 
