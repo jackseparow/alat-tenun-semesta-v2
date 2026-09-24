@@ -118,12 +118,12 @@
     </div>
   </main>
 
-  <!-- PUSTAKA BLOK BLOCKLY & THREE.JS LOGIC -->
+  <!-- DEFINISI BLOK BLOCKLY & GENERATOR CODE -->
   <script>
     const jsGen = (typeof javascript !== 'undefined' && javascript.javascriptGenerator) ? javascript.javascriptGenerator : javascriptGenerator;
 
     // ==========================================
-    // 1. KATEGORI ELEMEN ALAM (6 BLOK UTAMA)
+    // 1. KATEGORI ELEMEN ALAM
     // ==========================================
 
     // 1.1 Mahkota Kelopak / Daun
@@ -231,10 +231,10 @@
 })();\n`;
     };
 
-    // 1.4 Modul Origami
+    // 1.4 Modul Belah Ketupat (KATA "ORIGAMI" TELAH DIHILANGKAN)
     Blockly.Blocks['nature_origami_face'] = {
       init: function() {
-        this.appendDummyInput().appendField("modul origami (belah ketupat)");
+        this.appendDummyInput().appendField("modul belah ketupat");
         this.appendValueInput("SIZE").setCheck("Number").appendField("panjang");
         this.appendValueInput("ANGLE").setCheck("Number").appendField("sudut buka (°)");
         this.setInputsInline(false);
@@ -319,7 +319,7 @@
     };
 
     // ==========================================
-    // 2. KATEGORI TRANSFORMASI (DIPERBAIKI)
+    // 2. KATEGORI TRANSFORMASI (SUDUT INPUT DINAMIS)
     // ==========================================
 
     // 2.1 Translasi
@@ -396,17 +396,17 @@
 })();\n`;
     };
 
-    // 2.3 REVISI: ROTASI BIDANG (Dropdown XY, XZ, YZ + 1 Input Sudut Bebas)
+    // 2.3 ROTASI BIDANG (SUDUT MENGGUNAKAN VALUEINPUT BISA DITEMPEL BLOK MATEMATIKA / VARIABEL i)
     Blockly.Blocks['transform_rotate'] = {
       init: function() {
         this.appendDummyInput()
-            .appendField("Rotasikan di bidang")
+            .appendField("rotasi di bidang")
             .appendField(new Blockly.FieldDropdown([
               ["XY (Sumbu Z)", "XY"],
               ["XZ (Sumbu Y)", "XZ"],
               ["YZ (Sumbu X)", "YZ"]
             ]), "PLANE");
-        this.appendValueInput("ANGLE").setCheck("Number").appendField("sebesar sudut");
+        this.appendValueInput("ANGLE").setCheck("Number").appendField("sudut (°)");
         this.appendValueInput("PX").setCheck("Number").appendField("pusat X");
         this.appendValueInput("PY").setCheck("Number").appendField("Y");
         this.appendValueInput("PZ").setCheck("Number").appendField("Z");
@@ -419,7 +419,7 @@
     };
     jsGen.forBlock['transform_rotate'] = function(block, generator) {
       var plane = block.getFieldValue('PLANE');
-      var angle = generator.valueToCode(block, 'ANGLE', javascript.Order.ATOMIC) || '0';
+      var angleCode = generator.valueToCode(block, 'ANGLE', javascript.Order.ATOMIC) || '0';
       var px = generator.valueToCode(block, 'PX', javascript.Order.ATOMIC) || '0';
       var py = generator.valueToCode(block, 'PY', javascript.Order.ATOMIC) || '0';
       var pz = generator.valueToCode(block, 'PZ', javascript.Order.ATOMIC) || '0';
@@ -427,8 +427,8 @@
 
       return `
 (function() {
-  var rad = (${angle}) * Math.PI / 180;
-  var px = ${px}, py = ${py}, pz = ${pz};
+  var rad = (Number(${angleCode})) * Math.PI / 180;
+  var px = Number(${px}), py = Number(${py}), pz = Number(${pz});
   var plane = "${plane}";
 
   var tempGroup = new THREE.Group();
@@ -473,16 +473,16 @@
 })();\n`;
     };
 
-    // 2.4 BARU: ROTASI SUMBU GARIS 3D (Bebas Input Persamaan Garis)
+    // 2.4 ROTASI SUMBU GARIS 3D (SUDUT INPUT DINAMIS UNTUK ITERASI)
     Blockly.Blocks['transform_rotate_axis'] = {
       init: function() {
-        this.appendDummyInput().appendField("Rotasikan terhadap garis 3D");
+        this.appendDummyInput().appendField("rotasi terhadap garis 3D");
         this.appendValueInput("ANGLE").setCheck("Number").appendField("sudut (°)");
-        this.appendDummyInput().appendField("Garis Titik 1:");
+        this.appendDummyInput().appendField("Titik 1:");
         this.appendValueInput("X1").setCheck("Number").appendField("X1");
         this.appendValueInput("Y1").setCheck("Number").appendField("Y1");
         this.appendValueInput("Z1").setCheck("Number").appendField("Z1");
-        this.appendDummyInput().appendField("Garis Titik 2:");
+        this.appendDummyInput().appendField("Titik 2:");
         this.appendValueInput("X2").setCheck("Number").appendField("X2");
         this.appendValueInput("Y2").setCheck("Number").appendField("Y2");
         this.appendValueInput("Z2").setCheck("Number").appendField("Z2");
@@ -494,7 +494,7 @@
       }
     };
     jsGen.forBlock['transform_rotate_axis'] = function(block, generator) {
-      var angle = generator.valueToCode(block, 'ANGLE', javascript.Order.ATOMIC) || '0';
+      var angleCode = generator.valueToCode(block, 'ANGLE', javascript.Order.ATOMIC) || '0';
       var x1 = generator.valueToCode(block, 'X1', javascript.Order.ATOMIC) || '0';
       var y1 = generator.valueToCode(block, 'Y1', javascript.Order.ATOMIC) || '0';
       var z1 = generator.valueToCode(block, 'Z1', javascript.Order.ATOMIC) || '0';
@@ -505,9 +505,9 @@
 
       return `
 (function() {
-  var rad = (${angle}) * Math.PI / 180;
-  var p1 = new THREE.Vector3(${x1}, ${y1}, ${z1});
-  var p2 = new THREE.Vector3(${x2}, ${y2}, ${z2});
+  var rad = (Number(${angleCode})) * Math.PI / 180;
+  var p1 = new THREE.Vector3(Number(${x1}), Number(${y1}), Number(${z1}));
+  var p2 = new THREE.Vector3(Number(${x2}), Number(${y2}), Number(${z2}));
   var axis = new THREE.Vector3().subVectors(p2, p1).normalize();
   if (axis.length() === 0) axis.set(0, 0, 1);
 
@@ -532,7 +532,7 @@
 })();\n`;
     };
 
-    // 2.5 Ubah Warna Dropdown Palet
+    // 2.5 Ubah Warna Dropdown Palet Visual
     Blockly.Blocks['transform_color'] = {
       init: function() {
         this.appendDummyInput()
@@ -724,7 +724,7 @@
             <value name="PZ"><shadow type="math_number"><field name="NUM">0</field></shadow></value>
           </block>
 
-          <!-- BLOK ROTASI BIDANG (XY, XZ, YZ) -->
+          <!-- BLOK ROTASI BIDANG (SUDUT INPUT VALUE DAPAT DITEMPEL BLOK LAIN) -->
           <block type="transform_rotate">
             <field name="PLANE">XY</field>
             <value name="ANGLE"><shadow type="nature_angle"><field name="ANGLE">137.5</field></shadow></value>
@@ -733,7 +733,7 @@
             <value name="PZ"><shadow type="math_number"><field name="NUM">0</field></shadow></value>
           </block>
 
-          <!-- BLOK ROTASI SUMBU GARIS 3D BEBAS -->
+          <!-- BLOK ROTASI GARIS 3D (SUDUT INPUT VALUE DAPAT DITEMPEL BLOK LAIN) -->
           <block type="transform_rotate_axis">
             <value name="ANGLE"><shadow type="nature_angle"><field name="ANGLE">45</field></shadow></value>
             <value name="X1"><shadow type="math_number"><field name="NUM">0</field></shadow></value>
